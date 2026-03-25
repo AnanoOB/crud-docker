@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: secreto
+      MYSQL_DATABASE: miapp
+    ports:
+      - "3307:3306"       # <-- agrega esta línea
+    volumes:
+      - mis-datos:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mi-red
+
+  php-app:
+    build: .
+    container_name: php-app
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql-db
+    networks:
+      - mi-red
+
+volumes:
+  mis-datos:
+
+networks:
+  mi-red:
+    driver: bridge
